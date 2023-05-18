@@ -49,14 +49,6 @@ def get_predicted_date_by_invoices(invoices: List) -> List:
     return predicted_results
 
 
-def get_no_date_invoices_from_locations(locations):
-    invoices = [
-        location.get('invoice') for location in locations
-        if location.get('arrivale_date') is None
-    ]
-    return invoices
-
-
 def find_new_date_for_invoice(location, predicted_date):
     for element in predicted_date:
         if element.get('invoice') == location.get('invoice'):
@@ -74,13 +66,17 @@ def api_call():
     """
     locations = get_current_dislocation()
 
-    invoices = get_no_date_invoices_from_locations(locations)
+    invoices = [
+        location.get('invoice') for location in locations
+        if location.get('arrivale_date') is None
+    ]
     predicted_date = get_predicted_date_by_invoices(invoices)
 
     for location in locations:
         if location.get('arrivale_date') is None:
             new_date = find_new_date_for_invoice(location, predicted_date)
             location.update({'arrivale_date': new_date})
+
     return locations
 
 
